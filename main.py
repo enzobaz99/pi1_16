@@ -4,9 +4,9 @@ este codigo es para una app que trabaja con datos de juegos de steam
 
 from fastapi import FastAPI
 import pandas as pd
-from sklearn.metrics.pairwise        import cosine_similarity
-from sklearn.metrics.pairwise        import linear_kernel
+from sklearn.metrics.pairwise import  linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 
 
 app=FastAPI(debug=True)
@@ -116,7 +116,7 @@ def best_developer_year(año: int) -> dict:
     return resultado
 
 @app.get('/Cantidad de dinero gastado por jugador/')
-def Developer(desarrolladora: str) -> dict:
+def developer(desarrolladora: str) -> dict:
     # Filtrar el DataFrame por la desarrolladora
     df_desarrolladora = df[df['developer'] == desarrolladora]
 
@@ -183,7 +183,8 @@ def recomendacion_usuario(id_usuario: object) -> dict:
     # Filtrar el DataFrame de juegos para excluir los juegos revisados por el usuario
     df_juegos = df[~df['item_id_y'].isin(juegos_usuario)]
 
-    # Crear un vectorizador TF-IDF para procesar los datos de texto (por ejemplo, el título y las etiquetas)
+    # Crear un vectorizador TF-IDF para procesar los
+    # datos de texto (por ejemplo, el título y las etiquetas)
     tfidf_vectorizer = TfidfVectorizer()
 
     # Combinar los datos de texto relevantes en una sola columna
@@ -200,9 +201,8 @@ def recomendacion_usuario(id_usuario: object) -> dict:
 
     # Iterar a través de las reseñas del usuario
     for juego in juegos_usuario:
-        idx = df[df['item_id_y'] == juego].index[0]
+        idx = df_juegos[df['item_id_y'] == juego].index[0]
         similitudes_juego = list(enumerate(cosine_sim[idx]))
-        
         for juego_sim in similitudes_juego:
             juego_id = df.iloc[juego_sim[0]]['item_id_y']
             similitud = juego_sim[1]
