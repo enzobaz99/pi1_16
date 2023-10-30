@@ -6,10 +6,14 @@ from fastapi import FastAPI
 import pandas as pd
 from sklearn.metrics.pairwise import  linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from starlette.responses import RedirectResponse
 
 
 app=FastAPI(debug=True)
+
+@app.get('/')
+def raiz():
+    return RedirectResponse(url="/docs/")
 
 df = pd.read_csv('df_completo.csv')
 
@@ -63,7 +67,7 @@ def userdata(User_id: str) -> dict:
 
     return resultado
 
-@app.get('/Cantidad de dinero gastado por jugador/')
+@app.get('/Debe devolver el usuario que acumula más horas jugadas para el género dado/')
 def UserForGenre(genero: str) -> dict:
     # Filtrar el DataFrame por el género dado
     df_genero = df[df['genres'].str.contains(genero)]
@@ -88,7 +92,7 @@ def UserForGenre(genero: str) -> dict:
 
     return resultado
 
-@app.get('/Cantidad de dinero gastado por jugador/')
+@app.get('/Top 3 de los desarrolladores con los juegos mas recomendados/')
 def best_developer_year(año: int) -> dict:
     # Filtrar el DataFrame por el año dado
     df_año = df[df['posted year'] == año]
@@ -104,7 +108,6 @@ def best_developer_year(año: int) -> dict:
 
     # Ordenar por número de juegos recomendados de mayor a menor
     desarrolladores_recomendados = desarrolladores_recomendados.sort_values(by='id', ascending=False)
-
     # Tomar los 3 primeros desarrolladores
     top_3_desarrolladores = desarrolladores_recomendados.head(3)
 
@@ -115,7 +118,7 @@ def best_developer_year(año: int) -> dict:
 
     return resultado
 
-@app.get('/Cantidad de dinero gastado por jugador/')
+@app.get('/Desarrollador reseñas/')
 def developer(desarrolladora: str) -> dict:
     # Filtrar el DataFrame por la desarrolladora
     df_desarrolladora = df[df['developer'] == desarrolladora]
@@ -132,7 +135,7 @@ def developer(desarrolladora: str) -> dict:
 
     return resultado
 
-@app.get('/Cantidad de dinero gastado por jugador/')
+@app.get('/Lista con 5 juegos recomendados similares al ingresado/')
 def recomendacion_juego(id_producto: object) -> dict:
     # Filtrar el DataFrame para obtener los datos del juego con el ID especificado
     juego = df[df['id'] == id_producto]
@@ -169,7 +172,7 @@ def recomendacion_juego(id_producto: object) -> dict:
 
     return juegos_recomendados
 
-@app.get('/Cantidad de dinero gastado por jugador/')
+@app.get('/lista con 5 juegos recomendados para dicho usuario/')
 def recomendacion_usuario(id_usuario: object) -> dict:
     # Filtrar el DataFrame para obtener las reseñas del usuario con el ID especificado
     reseñas_usuario = df[df['user_id'] == id_usuario]
