@@ -18,30 +18,26 @@ def raiz():
 df = pd.read_csv('df_completo.csv')
 
 @app.get('/Cantidad de items y porcentaje de contenido gratuito/')
-def Developer(desarrollador: str) -> dict:
+def Developer(desarrollador: str) -> pd.DataFrame:
     # Filtrar el DataFrame por la empresa desarrolladora
-    df_desarrolladora = df[df['developer'] == desarrollador]
-    
-    df_desarrolladora['price'] = pd.to_numeric(df_desarrolladora['price'], errors='coerce')
+    df_desarrolladora = df[df['developer'] == desarrollador].copy()  # Copiar el DataFrame para evitar las advertencias
+
+    # Crear una columna para el precio y otra para indicar si es contenido gratuito
+    df_desarrolladora['Precio'] = pd.to_numeric(df_desarrolladora['price'], errors='coerce')
+    df_desarrolladora['Contenido Gratuito'] = df_desarrolladora['price'].str.contains('Free to Play|Free To Play|Play for Free!', case=False)
 
     # Crear un DataFrame agrupado por año
-    df_grouped = df_desarrolladora.groupby('release_date').agg({'id': 'count', 'price': 'mean'})
+    df_grouped = df_desarrolladora.groupby('release_date').agg({'id': 'count', 'Precio': 'mean', 'Contenido Gratuito': 'mean'})
 
     # Renombrar las columnas
-    df_grouped = df_grouped.rename(columns={'id': 'Cantidad de Items', 'price': 'Precio Promedio'})
-
-    # Identificar las variantes de contenido gratuito
-    variantes_contenido_gratuito = ['Free to Play', 'Free To Play', 'Play for Free!']
-
-    # Calcular el porcentaje de contenido gratuito
-    df_grouped['Contenido Free'] = (df_grouped['Precio Promedio'].apply(lambda x: any(variante in x for variante in variantes_contenido_gratuito))).sum() / df_grouped.shape[0] * 100
+    df_grouped = df_grouped.rename(columns={'id': 'Cantidad de Items', 'Precio': 'Precio Promedio', 'Contenido Gratuito': 'Porcentaje de Contenido Gratuito'})
 
     # Resetear el índice y rellenar los valores NaN
     df_grouped = df_grouped.reset_index()
     df_grouped = df_grouped.fillna(0)
 
     # Formatear los valores como porcentaje
-    df_grouped['Contenido Free'] = df_grouped['Contenido Free'].apply(lambda x: f'{x:.2f}%')
+    df_grouped['Porcentaje de Contenido Gratuito'] = (df_grouped['Porcentaje de Contenido Gratuito'] * 100).apply(lambda x: f'{x:.2f}%')
 
     return df_grouped
 
