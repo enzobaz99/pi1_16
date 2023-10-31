@@ -2,7 +2,7 @@
 este codigo es para una app que trabaja con datos de juegos de steam
 """
 from pydantic import BaseModel
-from fastapi import FastAPI, List
+from fastapi import FastAPI
 import pandas as pd
 from sklearn.metrics.pairwise import  linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,7 +24,7 @@ def raiz():
 
 df = pd.read_csv('df_completo.csv')
 
-@app.get('/Cantidad de items y porcentaje de contenido gratuito/', response_model=List[DeveloperResponse])
+@app.get('/Cantidad de items y porcentaje de contenido gratuito/', response_model=list[DeveloperResponse])
 def Developer(desarrollador: str):
     # Filtrar el DataFrame por la empresa desarrolladora
     df_desarrolladora = df[df['developer'] == desarrollador].copy()  # Copiar el DataFrame para evitar las advertencias
