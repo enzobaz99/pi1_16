@@ -21,6 +21,8 @@ df = pd.read_csv('df_completo.csv')
 def Developer(desarrollador: str) -> dict:
     # Filtrar el DataFrame por la empresa desarrolladora
     df_desarrolladora = df[df['developer'] == desarrollador]
+    
+    df_desarrolladora['price'] = pd.to_numeric(df_desarrolladora['price'], errors='coerce')
 
     # Crear un DataFrame agrupado por año
     df_grouped = df_desarrolladora.groupby('release_date').agg({'id': 'count', 'price': 'mean'})
