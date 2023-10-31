@@ -1,20 +1,11 @@
 """
 este codigo es para una app que trabaja con datos de juegos de steam
 """
-from pydantic import BaseModel
 from fastapi import FastAPI
 import pandas as pd
 from sklearn.metrics.pairwise import  linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from starlette.responses import RedirectResponse
-
-# Define el modelo Pydantic
-class DeveloperResponse(BaseModel):
-    release_date: str
-    Cantidad_de_Items: int
-    Precio_Promedio: float
-    Porcentaje_de_Contenido_Gratuito: str
-
 
 app=FastAPI(debug=True)
 
@@ -24,8 +15,8 @@ def raiz():
 
 df = pd.read_csv('df_completo.csv')
 
-@app.get('/Cantidad de items y porcentaje de contenido gratuito/', response_model=list[DeveloperResponse])
-def Developer(desarrollador: str):
+@app.get('/Cantidad de items y porcentaje de contenido gratuito/')
+def Developer(desarrollador: str) -> pd.DataFrame:
     # Filtrar el DataFrame por la empresa desarrolladora
     df_desarrolladora = df[df['developer'] == desarrollador].copy()  # Copiar el DataFrame para evitar las advertencias
 
@@ -46,26 +37,17 @@ def Developer(desarrollador: str):
     # Formatear los valores como porcentaje
     df_grouped['Porcentaje de Contenido Gratuito'] = (df_grouped['Porcentaje de Contenido Gratuito'] * 100).apply(lambda x: f'{x:.2f}%')
 
-    # Convertir los datos en objetos DeveloperResponse
-    resultados = []
-    for _, row in df_grouped.iterrows():
-        resultado = DeveloperResponse(
-            release_date=row['release_date'],
-            Cantidad_de_Items=row['Cantidad de Items'],
-            Precio_Promedio=row['Precio Promedio'],
-            Porcentaje_de_Contenido_Gratuito=row['Porcentaje de Contenido Gratuito']
-        )
-        resultados.append(resultado)
-
-    return resultados
+    return df_grouped
 
 @app.get('/Cantidad de dinero gastado por jugador/')
 def userdata(User_id: str) -> dict:
     # Filtrar el DataFrame por el User_id
     df_usuario = df[df['user_id'] == User_id]
 
+    df_usuario['Precio'] = pd.to_numeric(df_usuario['price'], errors='coerce')
+
     # Calcular la cantidad de dinero gastado por el usuario
-    dinero_gastado = df_usuario['price'].sum()
+    dinero_gastado = df_usuario['Precio'].sum()
 
     # Calcular el porcentaje de recomendación en base a reviews.recommend
     porcentaje_recomendacion = (df_usuario['recommend'].sum() / df_usuario.shape[0]) * 100
@@ -76,7 +58,7 @@ def userdata(User_id: str) -> dict:
     # Crear un diccionario con los resultados
     resultado = {
         "User_id": User_id,
-        "Dinero gastado": f"{dinero_gastado} USD",
+        "Dinero gastado": f"{dinero_gastado:.2f} USD",
         "% de recomendación": f"{porcentaje_recomendacion:.2f}%",
         "Cantidad de items": cantidad_items
     }
