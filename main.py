@@ -1,12 +1,19 @@
 """
 este codigo es para una app que trabaja con datos de juegos de steam
 """
-
-from fastapi import FastAPI
+from pydantic import BaseModel
+from fastapi import FastAPI, List
 import pandas as pd
 from sklearn.metrics.pairwise import  linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from starlette.responses import RedirectResponse
+
+# Define el modelo Pydantic
+class DeveloperResponse(BaseModel):
+    release_date: str
+    Cantidad_de_Items: int
+    Precio_Promedio: float
+    Porcentaje_de_Contenido_Gratuito: str
 
 
 app=FastAPI(debug=True)
@@ -17,8 +24,8 @@ def raiz():
 
 df = pd.read_csv('df_completo.csv')
 
-@app.get('/Cantidad de items y porcentaje de contenido gratuito/')
-def Developer(desarrollador: str) -> pd.DataFrame:
+@app.get('/Cantidad de items y porcentaje de contenido gratuito/', response_model=List[DeveloperResponse])
+def Developer(desarrollador: str):
     # Filtrar el DataFrame por la empresa desarrolladora
     df_desarrolladora = df[df['developer'] == desarrollador].copy()  # Copiar el DataFrame para evitar las advertencias
 
@@ -39,7 +46,18 @@ def Developer(desarrollador: str) -> pd.DataFrame:
     # Formatear los valores como porcentaje
     df_grouped['Porcentaje de Contenido Gratuito'] = (df_grouped['Porcentaje de Contenido Gratuito'] * 100).apply(lambda x: f'{x:.2f}%')
 
-    return df_grouped
+    # Convertir los datos en objetos DeveloperResponse
+    resultados = []
+    for _, row in df_grouped.iterrows():
+        resultado = DeveloperResponse(
+            release_date=row['release_date'],
+            Cantidad_de_Items=row['Cantidad de Items'],
+            Precio_Promedio=row['Precio Promedio'],
+            Porcentaje_de_Contenido_Gratuito=row['Porcentaje de Contenido Gratuito']
+        )
+        resultados.append(resultado)
+
+    return resultados
 
 @app.get('/Cantidad de dinero gastado por jugador/')
 def userdata(User_id: str) -> dict:
