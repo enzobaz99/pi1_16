@@ -18,11 +18,11 @@ Este proyecto consiste en crear una API que utiliza un modelo de recomendación 
 **`ETL`**: donde se nos pidio desanidar harchivos json.
 
 **`desarrollar una API`**: en la api teniamos que desarrollar funciones:
-+ def PlayTimeGenre( genero : str ) Debe devolver año con mas horas jugadas para dicho género.
-+ def UserForGenre( genero : str ) Debe devolver el usuario que acumula más horas jugadas para el género dado y una lista de la acumulación de horas jugadas por año.
-+ def UsersRecommend( año : int ) Devuelve el top 3 de juegos MÁS recomendados por usuarios para el año dado.
-+ def UsersNotRecommend( año : int ) Devuelve el top 3 de juegos MENOS recomendados por usuarios para el año dado.
-+ def sentiment_analysis( año : int ) Según el año de lanzamiento, se devuelve una lista con la cantidad de registros de reseñas de usuarios que se encuentren categorizados con un análisis de sentimiento.
++ def developer( desarrollador : str ): Cantidad de items y porcentaje de contenido Free por año según empresa desarrolladora.
++ def userdata( User_id : str ): Debe devolver cantidad de dinero gastado por el usuario, el porcentaje de recomendación en base a reviews.recommend y cantidad de items.
++ def UserForGenre( genero : str ): Debe devolver el usuario que acumula más horas jugadas para el género dado y una lista de la acumulación de horas jugadas por año de lanzamiento.
++ def best_developer_year( año : int ): Devuelve el top 3 de desarrolladores con juegos MÁS recomendados por usuarios para el año dado.
++ def developer_reviews_analysis( desarrolladora : str ): Según el desarrollador, se devuelve un diccionario con el nombre del desarrollador como llave y una lista con la cantidad total de registros de reseñas de usuarios que se encuentren categorizados con un análisis de sentimiento como valor positivo o negativo.
 
 **`EDA`**: donde mostraramos datos un poco mas estadisticos para mayor comprencion.
 
